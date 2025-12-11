@@ -16,12 +16,18 @@
     'website': 'https://www.tuempresa.com',
     'depends': ['base', 'web', 'portal', 'mail'],
     'data': [
+        # 1. Primero la seguridad básica (grupos)
         'security/security.xml',
+        # 2. Luego los permisos de acceso
         'security/ir.model.access.csv',
+        # 3. Después las reglas de registro (requieren que existan los modelos)
+        'security/ir_rule.xml',
+        # 4. Vistas y menús
         'views/menu_views.xml',
         'views/cancha_views.xml',
         'views/reserva_views.xml',
         'views/portal_templates.xml',
+        # 5. Datos de demostración
         'data/cancha_data.xml',
     ],
     'demo': [],
