@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Vista Tree de Reservas -->
+        <record id="view_reserva_reserva_tree" model="ir.ui.view">
+            <field name="name">reserva.reserva.tree</field>
+            <field name="model">reserva.reserva</field>
+            <field name="arch" type="xml">
+                <tree string="Reservas" decoration-success="estado=='confirmada'" 
+                      decoration-info="estado=='en_curso'" decoration-muted="estado=='cancelada'">
+                    <field name="name"/>
+                    <field name="cancha_id"/>
+                    <field name="usuario_id"/>
+                    <field name="fecha_inicio"/>
+                    <field name="fecha_fin"/>
+                    <field name="duracion" widget="float_time"/>
+                    <field name="precio_total" widget="monetary"/>
+                    <field name="estado" decoration-success="estado=='confirmada'" 
+                           decoration-info="estado=='en_curso'"
+                           decoration-danger="estado=='cancelada'"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Vista Form de Reservas -->
+        <record id="view_reserva_reserva_form" model="ir.ui.view">
+            <field name="name">reserva.reserva.form</field>
+            <field name="model">reserva.reserva</field>
+            <field name="arch" type="xml">
+                <form string="Reserva">
+                    <header>
+                        <button name="action_confirmar" string="Confirmar" type="object" 
+                                class="btn-primary" invisible="estado != 'borrador'"/>
+                        <button name="action_iniciar" string="Iniciar" type="object" 
+                                class="btn-success" invisible="estado != 'confirmada'"/>
+                        <button name="action_completar" string="Completar" type="object" 
+                                class="btn-info" invisible="estado != 'en_curso'"/>
+                        <button name="action_cancelar" string="Cancelar" type="object" 
+                                class="btn-danger" invisible="estado in ['completada', 'cancelada']"/>
+                        <button name="action_volver_borrador" string="Volver a Borrador" type="object" 
+                                invisible="estado != 'cancelada'" groups="reserva_canchas.group_reserva_admin"/>
+                        <field name="estado" widget="statusbar" 
+                               statusbar_visible="borrador,confirmada,en_curso,completada"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" 
+                                    name="action_view_cancha" icon="fa-futbol-o">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_text">Ver Cancha</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="cancha_id" options="{'no_create': True}"/>
+                                <field name="usuario_id" options="{'no_create': True}" 
+                                       readonly="estado != 'borrador'"/>
+                                <field name="partner_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="fecha_inicio" readonly="estado != 'borrador'"/>
+                                <field name="fecha_fin" readonly="estado != 'borrador'"/>
+                                <field name="duracion" widget="float_time"/>
+                                <field name="precio_total" widget="monetary"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Notas">
+                                <field name="notas" placeholder="Notas adicionales sobre la reserva..."/>
+                            </page>
+                            <page string="Información Adicional">
+                                <group>
+                                    <field name="fecha_creacion"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista Kanban de Reservas -->
+        <record id="view_reserva_reserva_kanban" model="ir.ui.view">
+            <field name="name">reserva.reserva.kanban</field>
+            <field name="model">reserva.reserva</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="cancha_id"/>
+                    <field name="fecha_inicio"/>
+                    <field name="fecha_fin"/>
+                    <field name="estado"/>
+                    <field name="precio_total"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                    <div class="o_kanban_record_subtitle">
+                                        <field name="cancha_id"/>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-calendar"/> <field name="fecha_inicio"/>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="precio_total" widget="monetary"/>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="estado" widget="label_selection" 
+                                                   options="{'classes': {'borrador': 'default', 'confirmada': 'success', 'en_curso': 'info', 'completada': 'primary', 'cancelada': 'danger'}}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Vista Calendar de Reservas -->
+        <record id="view_reserva_reserva_calendar" model="ir.ui.view">
+            <field name="name">reserva.reserva.calendar</field>
+            <field name="model">reserva.reserva</field>
+            <field name="arch" type="xml">
+                <calendar string="Calendario de Reservas" date_start="fecha_inicio" 
+                          date_stop="fecha_fin" color="cancha_id" mode="week">
+                    <field name="name"/>
+                    <field name="cancha_id"/>
+                    <field name="usuario_id"/>
+                    <field name="estado"/>
+                </calendar>
+            </field>
+        </record>
+
+        <!-- Vista de Búsqueda -->
+        <record id="view_reserva_reserva_search" model="ir.ui.view">
+            <field name="name">reserva.reserva.search</field>
+            <field name="model">reserva.reserva</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Reservas">
+                    <field name="name"/>
+                    <field name="cancha_id"/>
+                    <field name="usuario_id"/>
+                    <filter string="Mis Reservas" name="mis_reservas" 
+                            domain="[('usuario_id', '=', uid)]"/>
+                    <separator/>
+                    <filter string="Borrador" name="borrador" 
+                            domain="[('estado', '=', 'borrador')]"/>
+                    <filter string="Confirmadas" name="confirmada" 
+                            domain="[('estado', '=', 'confirmada')]"/>
+                    <filter string="En Curso" name="en_curso" 
+                            domain="[('estado', '=', 'en_curso')]"/>
+                    <filter string="Completadas" name="completada" 
+                            domain="[('estado', '=', 'completada')]"/>
+                    <filter string="Canceladas" name="cancelada" 
+                            domain="[('estado', '=', 'cancelada')]"/>
+                    <separator/>
+                    <filter string="Hoy" name="hoy" 
+                            domain="[('fecha_inicio', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))), ('fecha_inicio', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
+                    <filter string="Esta Semana" name="esta_semana" 
+                            domain="[('fecha_inicio', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')), ('fecha_inicio', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter string="Este Mes" name="este_mes" 
+                            domain="[('fecha_inicio', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Cancha" name="group_cancha" context="{'group_by': 'cancha_id'}"/>
+                        <filter string="Usuario" name="group_usuario" context="{'group_by': 'usuario_id'}"/>
+                        <filter string="Estado" name="group_estado" context="{'group_by': 'estado'}"/>
+                        <filter string="Fecha" name="group_fecha" context="{'group_by': 'fecha_inicio'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción de Ventana: Todas las Reservas -->
+        <record id="action_reserva_reserva" model="ir.actions.act_window">
+            <field name="name">Reservas</field>
+            <field name="res_model">reserva.reserva</field>
+            <field name="view_mode">tree,kanban,form,calendar</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear una nueva reserva
+                </p>
+                <p>
+                    Gestione las reservas de canchas deportivas.
+                </p>
+            </field>
+        </record>
+
+        <!-- Acción de Ventana: Mis Reservas -->
+        <record id="action_reserva_mis_reservas" model="ir.actions.act_window">
+            <field name="name">Mis Reservas</field>
+            <field name="res_model">reserva.reserva</field>
+            <field name="view_mode">kanban,tree,form,calendar</field>
+            <field name="context">{'search_default_mis_reservas': 1}</field>
+            <field name="domain">[('usuario_id', '=', uid)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear una nueva reserva
+                </p>
+                <p>
+                    Aquí puede ver y gestionar sus reservas de canchas.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

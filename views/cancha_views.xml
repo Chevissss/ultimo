@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Vista Tree de Canchas -->
+        <record id="view_reserva_cancha_tree" model="ir.ui.view">
+            <field name="name">reserva.cancha.tree</field>
+            <field name="model">reserva.cancha</field>
+            <field name="arch" type="xml">
+                <tree string="Canchas Deportivas">
+                    <field name="nombre"/>
+                    <field name="tipo"/>
+                    <field name="capacidad"/>
+                    <field name="precio_hora" widget="monetary"/>
+                    <field name="estado" decoration-success="estado=='disponible'" 
+                           decoration-warning="estado=='mantenimiento'"
+                           decoration-danger="estado=='inactiva'"/>
+                    <field name="reservas_count"/>
+                    <field name="activa" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Vista Form de Canchas -->
+        <record id="view_reserva_cancha_form" model="ir.ui.view">
+            <field name="name">reserva.cancha.form</field>
+            <field name="model">reserva.cancha</field>
+            <field name="arch" type="xml">
+                <form string="Cancha Deportiva">
+                    <header>
+                        <button name="action_set_disponible" string="Disponible" 
+                                type="object" class="btn-success"
+                                invisible="estado == 'disponible'"/>
+                        <button name="action_set_mantenimiento" string="En Mantenimiento" 
+                                type="object" class="btn-warning"
+                                invisible="estado == 'mantenimiento'"/>
+                        <button name="action_set_inactiva" string="Inactivar" 
+                                type="object" class="btn-danger"
+                                invisible="estado == 'inactiva'"/>
+                        <field name="estado" widget="statusbar" 
+                               statusbar_visible="disponible,mantenimiento,inactiva"/>
+                    </header>
+                    <sheet>
+                        <field name="imagen" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="nombre" placeholder="Nombre de la cancha"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="tipo"/>
+                                <field name="capacidad"/>
+                                <field name="precio_hora" widget="monetary"/>
+                            </group>
+                            <group>
+                                <field name="ubicacion"/>
+                                <field name="activa" widget="boolean_toggle"/>
+                                <field name="reservas_count"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Descripción">
+                                <field name="descripcion" placeholder="Descripción de la cancha..."/>
+                            </page>
+                            <page string="Reservas">
+                                <field name="reserva_ids" readonly="1">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="usuario_id"/>
+                                        <field name="fecha_inicio"/>
+                                        <field name="fecha_fin"/>
+                                        <field name="estado" decoration-success="estado=='confirmada'"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Notas">
+                                <field name="notas" placeholder="Notas adicionales..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista Kanban de Canchas -->
+        <record id="view_reserva_cancha_kanban" model="ir.ui.view">
+            <field name="name">reserva.cancha.kanban</field>
+            <field name="model">reserva.cancha</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="id"/>
+                    <field name="nombre"/>
+                    <field name="tipo"/>
+                    <field name="precio_hora"/>
+                    <field name="estado"/>
+                    <field name="imagen"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="o_kanban_image">
+                                    <img t-att-src="kanban_image('reserva.cancha', 'imagen', record.id.raw_value)" 
+                                         alt="Cancha" class="o_image_64_cover"/>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="nombre"/>
+                                    </strong>
+                                    <div class="o_kanban_record_subtitle">
+                                        <field name="tipo"/>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="precio_hora" widget="monetary"/>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="estado" widget="label_selection" 
+                                                   options="{'classes': {'disponible': 'success', 'mantenimiento': 'warning', 'inactiva': 'danger'}}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Vista de Búsqueda -->
+        <record id="view_reserva_cancha_search" model="ir.ui.view">
+            <field name="name">reserva.cancha.search</field>
+            <field name="model">reserva.cancha</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Canchas">
+                    <field name="nombre"/>
+                    <field name="tipo"/>
+                    <field name="ubicacion"/>
+                    <filter string="Disponibles" name="disponible" 
+                            domain="[('estado', '=', 'disponible')]"/>
+                    <filter string="En Mantenimiento" name="mantenimiento" 
+                            domain="[('estado', '=', 'mantenimiento')]"/>
+                    <filter string="Activas" name="activa" 
+                            domain="[('activa', '=', True)]"/>
+                    <separator/>
+                    <filter string="Fútbol" name="futbol" 
+                            domain="[('tipo', '=', 'futbol')]"/>
+                    <filter string="Básquetbol" name="basquet" 
+                            domain="[('tipo', '=', 'basquet')]"/>
+                    <filter string="Vóleibol" name="voley" 
+                            domain="[('tipo', '=', 'voley')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Tipo" name="group_tipo" context="{'group_by': 'tipo'}"/>
+                        <filter string="Estado" name="group_estado" context="{'group_by': 'estado'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción de Ventana -->
+        <record id="action_reserva_cancha" model="ir.actions.act_window">
+            <field name="name">Canchas Deportivas</field>
+            <field name="res_model">reserva.cancha</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'search_default_disponible': 1, 'search_default_activa': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear una nueva cancha deportiva
+                </p>
+                <p>
+                    Registre las canchas deportivas disponibles para reserva.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

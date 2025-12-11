@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Portal: Mi Cuenta - Agregar enlace a Mis Reservas -->
+        <template id="portal_my_home_menu_reservas" name="Portal My Home: Reservas" 
+                  inherit_id="portal.portal_my_home" priority="40">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+                <t t-set="reservas_count" t-value="len(request.env['reserva.reserva'].search([('usuario_id', '=', request.env.user.id)]))"/>
+                <t t-if="reservas_count" t-call="portal.portal_docs_entry">
+                    <t t-set="title">Reservas</t>
+                    <t t-set="url" t-value="'/my/reservas'"/>
+                    <t t-set="placeholder_count" t-value="'reservas_count'"/>
+                </t>
+            </xpath>
+        </template>
+
+        <!-- Portal: Listado de Mis Reservas -->
+        <template id="portal_my_reservas" name="Mis Reservas">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+                <t t-call="portal.portal_searchbar">
+                    <t t-set="title">Mis Reservas</t>
+                </t>
+
+                <t t-if="not reservas">
+                    <div class="alert alert-warning" role="alert">
+                        No hay reservas registradas.
+                    </div>
+                </t>
+
+                <t t-if="reservas" t-call="portal.portal_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Reserva #</th>
+                            <th>Cancha</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Duración</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="reservas" t-as="reserva">
+                            <tr>
+                                <td><a t-att-href="reserva.access_url"><t t-esc="reserva.name"/></a></td>
+                                <td><t t-esc="reserva.cancha_id.nombre"/></td>
+                                <td><t t-esc="reserva.fecha_inicio.strftime('%d/%m/%Y %H:%M')"/></td>
+                                <td><t t-esc="reserva.fecha_fin.strftime('%d/%m/%Y %H:%M')"/></td>
+                                <td><t t-esc="'%.1f' % reserva.duracion"/> hrs</td>
+                                <td><t t-esc="reserva.precio_total" t-options="{'widget': 'monetary', 'display_currency': reserva.company_id.currency_id}"/></td>
+                                <td>
+                                    <span t-att-class="'badge badge-pill badge-%s' % ('success' if reserva.estado == 'confirmada' else 'info' if reserva.estado == 'en_curso' else 'primary' if reserva.estado == 'completada' else 'danger' if reserva.estado == 'cancelada' else 'secondary')">
+                                        <t t-esc="dict(reserva._fields['estado'].selection).get(reserva.estado)"/>
+                                    </span>
+                                </td>
+                                <td>
+                                    <a t-att-href="reserva.access_url" class="btn btn-sm btn-secondary">
+                                        <i class="fa fa-eye"/> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </t>
+            </t>
+        </template>
+
+        <!-- Portal: Detalle de Reserva -->
+        <template id="portal_reserva_page" name="Detalle de Reserva">
+            <t t-call="portal.portal_layout">
+                <t t-set="o_portal_fullwidth_alert" groups="reserva_canchas.group_reserva_admin">
+                    <t t-call="portal.portal_back_in_edit_mode">
+                        <t t-set="backend_url" t-value="'/web#model=reserva.reserva&amp;id=%s&amp;action=%s&amp;view_type=form' % (reserva.id, reserva.env.ref('reserva_canchas.action_reserva_reserva').id)"/>
+                    </t>
+                </t>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4>
+                                    <t t-esc="reserva.name"/>
+                                    <span t-att-class="'badge badge-%s float-right' % ('success' if reserva.estado == 'confirmada' else 'info' if reserva.estado == 'en_curso' else 'primary' if reserva.estado == 'completada' else 'danger' if reserva.estado == 'cancelada' else 'secondary')">
+                                        <t t-esc="dict(reserva._fields['estado'].selection).get(reserva.estado)"/>
+                                    </span>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-6">
+                                <strong>Cancha:</strong>
+                                <div class="row">
+                                    <div class="col-10">
+                                        <span t-field="reserva.cancha_id.nombre"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <strong>Cliente:</strong>
+                                <div class="row">
+                                    <div class="col-10">
+                                        <span t-field="reserva.usuario_id.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-6">
+                                <strong>Fecha y Hora de Inicio:</strong>
+                                <div><t t-esc="reserva.fecha_inicio.strftime('%d/%m/%Y %H:%M')"/></div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <strong>Fecha y Hora de Fin:</strong>
+                                <div><t t-esc="reserva.fecha_fin.strftime('%d/%m/%Y %H:%M')"/></div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12 col-md-6">
+                                <strong>Duración:</strong>
+                                <div><t t-esc="'%.1f' % reserva.duracion"/> horas</div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <strong>Precio Total:</strong>
+                                <div><span t-field="reserva.precio_total" t-options="{'widget': 'monetary', 'display_currency': reserva.company_id.currency_id}"/></div>
+                            </div>
+                        </div>
+
+                        <t t-if="reserva.notas">
+                            <div class="row">
+                                <div class="col-12">
+                                    <strong>Notas:</strong>
+                                    <div><t t-esc="reserva.notas"/></div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <t t-if="reserva.estado == 'borrador'">
+                                    <a href="#" class="btn btn-danger" t-att-data-id="reserva.id" onclick="return confirmCancel(this);">
+                                        <i class="fa fa-times"/> Cancelar Reserva
+                                    </a>
+                                </t>
+                                <t t-if="reserva.estado == 'confirmada'">
+                                    <a href="#" class="btn btn-warning" t-att-data-id="reserva.id" onclick="return confirmCancel(this);">
+                                        <i class="fa fa-times"/> Cancelar Reserva
+                                    </a>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="/my/reservas" class="btn btn-secondary">
+                        <i class="fa fa-arrow-left"/> Volver a Mis Reservas
+                    </a>
+                </div>
+
+                <script>
+                    function confirmCancel(element) {
+                        if (confirm('¿Está seguro de que desea cancelar esta reserva?')) {
+                            var reservaId = element.getAttribute('data-id');
+                            window.location.href = '/my/reservas/' + reservaId + '/cancel';
+                        }
+                        return false;
+                    }
+                </script>
+            </t>
+        </template>
+
+        <!-- Portal: Nueva Reserva - Listado de Canchas -->
+        <template id="portal_nueva_reserva_canchas" name="Nueva Reserva - Seleccionar Cancha">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-4">
+                    <h2>Nueva Reserva - Seleccione una Cancha</h2>
+
+                    <t t-if="not canchas">
+                        <div class="alert alert-warning" role="alert">
+                            No hay canchas disponibles en este momento.
+                        </div>
+                    </t>
+
+                    <div class="row mt-4">
+                        <t t-foreach="canchas" t-as="cancha">
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <t t-if="cancha.imagen">
+                                        <img class="card-img-top" t-att-src="'data:image/png;base64,%s' % cancha.imagen.decode('utf-8')" alt="Cancha"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                            <i class="fa fa-futbol-o fa-5x"/>
+                                        </div>
+                                    </t>
+                                    <div class="card-body">
+                                        <h5 class="card-title"><t t-esc="cancha.nombre"/></h5>
+                                        <p class="card-text">
+                                            <strong>Tipo:</strong> <t t-esc="dict(cancha._fields['tipo'].selection).get(cancha.tipo)"/><br/>
+                                            <strong>Capacidad:</strong> <t t-esc="cancha.capacidad"/> personas<br/>
+                                            <strong>Precio/hora:</strong> <t t-esc="cancha.precio_hora" t-options="{'widget': 'monetary'}"/>
+                                        </p>
+                                        <t t-if="cancha.descripcion">
+                                            <p class="card-text"><small><t t-esc="cancha.descripcion[:100]"/>...</small></p>
+                                        </t>
+                                        <a t-att-href="'/my/reservas/nueva/%s' % cancha.id" class="btn btn-primary btn-block">
+                                            <i class="fa fa-calendar"/> Reservar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Portal: Nueva Reserva - Formulario -->
+        <template id="portal_nueva_reserva_form" name="Nueva Reserva - Formulario">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-4">
+                    <h2>Nueva Reserva</h2>
+
+                    <div class="row mt-4">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4><t t-esc="cancha.nombre"/></h4>
+                                    <p>
+                                        <strong>Tipo:</strong> <t t-esc="dict(cancha._fields['tipo'].selection).get(cancha.tipo)"/><br/>
+                                        <strong>Capacidad:</strong> <t t-esc="cancha.capacidad"/> personas<br/>
+                                        <strong>Precio/hora:</strong> <t t-esc="cancha.precio_hora" t-options="{'widget': 'monetary'}"/>
+                                    </p>
+
+                                    <form action="/my/reservas/crear" method="POST" class="mt-4">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="cancha_id" t-att-value="cancha.id"/>
+
+                                        <div class="form-group">
+                                            <label for="fecha_inicio">Fecha y Hora de Inicio *</label>
+                                            <input type="datetime-local" class="form-control" id="fecha_inicio" 
+                                                   name="fecha_inicio" required="required"/>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="fecha_fin">Fecha y Hora de Fin *</label>
+                                            <input type="datetime-local" class="form-control" id="fecha_fin" 
+                                                   name="fecha_fin" required="required"/>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="notas">Notas (opcional)</label>
+                                            <textarea class="form-control" id="notas" name="notas" rows="3"></textarea>
+                                        </div>
+
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle"/> La duración mínima es 30 minutos y máxima 8 horas.
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-check"/> Crear Reserva
+                                        </button>
+                                        <a href="/my/reservas/nueva" class="btn btn-secondary">
+                                            <i class="fa fa-arrow-left"/> Volver
+                                        </a>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <t t-if="cancha.imagen">
+                                <img class="img-fluid rounded" t-att-src="'data:image/png;base64,%s' % cancha.imagen.decode('utf-8')" alt="Cancha"/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Menú Principal -->
+        <menuitem id="menu_reserva_canchas_root"
+                  name="Reserva Canchas"
+                  sequence="10"
+                  web_icon="reserva_canchas,static/description/icon.png"/>
+
+        <!-- Submenú: Reservas -->
+        <menuitem id="menu_reserva_canchas_reservas"
+                  name="Reservas"
+                  parent="menu_reserva_canchas_root"
+                  sequence="10"/>
+
+        <menuitem id="menu_reserva_reserva"
+                  name="Todas las Reservas"
+                  parent="menu_reserva_canchas_reservas"
+                  action="action_reserva_reserva"
+                  sequence="10"/>
+
+        <menuitem id="menu_reserva_reserva_mis_reservas"
+                  name="Mis Reservas"
+                  parent="menu_reserva_canchas_reservas"
+                  action="action_reserva_mis_reservas"
+                  sequence="20"
+                  groups="group_reserva_usuario"/>
+
+        <!-- Submenú: Canchas -->
+        <menuitem id="menu_reserva_canchas_canchas"
+                  name="Canchas"
+                  parent="menu_reserva_canchas_root"
+                  sequence="20"/>
+
+        <menuitem id="menu_reserva_cancha"
+                  name="Canchas Deportivas"
+                  parent="menu_reserva_canchas_canchas"
+                  action="action_reserva_cancha"
+                  sequence="10"/>
+
+        <!-- Submenú: Configuración (solo para admin) -->
+        <menuitem id="menu_reserva_canchas_config"
+                  name="Configuración"
+                  parent="menu_reserva_canchas_root"
+                  sequence="100"
+                  groups="group_reserva_admin"/>
+
+    </data>
+</odoo>

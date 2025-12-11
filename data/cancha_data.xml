@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Canchas de ejemplo -->
+        <record id="cancha_futbol_1" model="reserva.cancha">
+            <field name="nombre">Cancha de Fútbol 1</field>
+            <field name="tipo">futbol</field>
+            <field name="descripcion">Cancha de fútbol sintético de alta calidad</field>
+            <field name="capacidad">22</field>
+            <field name="precio_hora">80.00</field>
+            <field name="estado">disponible</field>
+            <field name="activa" eval="True"/>
+            <field name="ubicacion">Zona Norte</field>
+        </record>
+
+        <record id="cancha_futbol_2" model="reserva.cancha">
+            <field name="nombre">Cancha de Fútbol 2</field>
+            <field name="tipo">futbol</field>
+            <field name="descripcion">Cancha de fútbol 7 con césped sintético</field>
+            <field name="capacidad">14</field>
+            <field name="precio_hora">60.00</field>
+            <field name="estado">disponible</field>
+            <field name="activa" eval="True"/>
+            <field name="ubicacion">Zona Norte</field>
+        </record>
+
+        <record id="cancha_basquet_1" model="reserva.cancha">
+            <field name="nombre">Cancha de Básquetbol 1</field>
+            <field name="tipo">basquet</field>
+            <field name="descripcion">Cancha profesional de básquetbol techada</field>
+            <field name="capacidad">10</field>
+            <field name="precio_hora">50.00</field>
+            <field name="estado">disponible</field>
+            <field name="activa" eval="True"/>
+            <field name="ubicacion">Zona Central</field>
+        </record>
+
+        <record id="cancha_voley_1" model="reserva.cancha">
+            <field name="nombre">Cancha de Vóleibol</field>
+            <field name="tipo">voley</field>
+            <field name="descripcion">Cancha de vóleibol con piso de madera</field>
+            <field name="capacidad">12</field>
+            <field name="precio_hora">45.00</field>
+            <field name="estado">disponible</field>
+            <field name="activa" eval="True"/>
+            <field name="ubicacion">Zona Sur</field>
+        </record>
+
+        <record id="cancha_tenis_1" model="reserva.cancha">
+            <field name="nombre">Cancha de Tenis 1</field>
+            <field name="tipo">tenis</field>
+            <field name="descripcion">Cancha de tenis profesional con superficie dura</field>
+            <field name="capacidad">4</field>
+            <field name="precio_hora">40.00</field>
+            <field name="estado">disponible</field>
+            <field name="activa" eval="True"/>
+            <field name="ubicacion">Zona Este</field>
+        </record>
+
+        <record id="cancha_padel_1" model="reserva.cancha">
+            <field name="nombre">Cancha de Pádel 1</field>
+            <field name="tipo">padel</field>
+            <field name="descripcion">Cancha de pádel con iluminación LED</field>
+            <field name="capacidad">4</field>
+            <field name="precio_hora">55.00</field>
+            <field name="estado">disponible</field>
+            <field name="activa" eval="True"/>
+            <field name="ubicacion">Zona Oeste</field>
+        </record>
+
+    </data>
+</odoo>
