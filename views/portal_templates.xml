@@ -191,35 +191,16 @@
             </style>
         </template>
 
-        <!-- Portal: Home Page with Featured Fields -->
+        <!-- Portal: Home Page with Reservas Counter -->
         <template id="portal_my_home_reservas" name="Portal My Home: Reservas" 
                   inherit_id="portal.portal_my_home" priority="10">
-            <xpath expr="//div[@id='o_portal_my_home_content']" position="before">
-                <t t-call="reserva_canchas.portal_reserva_styles"/>
-                
-                <div class="reserva-hero">
-                    <div class="container">
-                        <h1><i class="fa fa-futbol-o"/> Reserva tu Cancha Deportiva</h1>
-                        <p>Encuentra y reserva la cancha perfecta para tu deporte favorito</p>
-                        <a href="/my/reservas/nueva" class="btn btn-light btn-lg btn-modern mt-3">
-                            <i class="fa fa-calendar-plus-o"/> Nueva Reserva
-                        </a>
-                    </div>
-                </div>
-            </xpath>
-            
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-call="reserva_canchas.portal_reserva_styles"/>
                 <t t-set="reservas_count" t-value="len(request.env['reserva.reserva'].search([('usuario_id', '=', request.env.user.id)]))"/>
-                <t t-if="reservas_count">
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <a href="/my/reservas" class="text-decoration-none">
-                            <div class="stat-card">
-                                <div class="stat-number"><t t-esc="reservas_count"/></div>
-                                <div class="stat-label">Mis Reservas</div>
-                                <i class="fa fa-calendar-check-o mt-2" style="font-size: 2rem; color: #667eea;"/>
-                            </div>
-                        </a>
-                    </div>
+                <t t-if="reservas_count" t-call="portal.portal_docs_entry">
+                    <t t-set="title">Reservas</t>
+                    <t t-set="url" t-value="'/my/reservas'"/>
+                    <t t-set="placeholder_count" t-value="'reservas_count'"/>
                 </t>
             </xpath>
         </template>
