@@ -2,7 +2,638 @@
 <odoo>
     <data>
 
-        <!-- Portal: Mi Cuenta - Agregar enlace a Mis Reservas -->
+        <!-- Inline CSS Styles -->
+        <template id="portal_reserva_styles" name="Portal Reserva Styles">
+            <style>
+                /* Modern Color Palette */
+                :root {
+                    --primary-color: #2563eb;
+                    --success-color: #10b981;
+                    --warning-color: #f59e0b;
+                    --danger-color: #ef4444;
+                    --dark-color: #1f2937;
+                    --light-color: #f3f4f6;
+                }
+
+                /* Hero Section */
+                .reserva-hero {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 3rem 0;
+                    margin-bottom: 2rem;
+                    border-radius: 0 0 20px 20px;
+                }
+
+                .reserva-hero h1 {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                }
+
+                .reserva-hero p {
+                    font-size: 1.2rem;
+                    opacity: 0.9;
+                }
+
+                /* Field Cards */
+                .field-card {
+                    border: none;
+                    border-radius: 15px;
+                    overflow: hidden;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    transition: all 0.3s ease;
+                    height: 100%;
+                }
+
+                .field-card:hover {
+                    transform: translateY(-10px);
+                    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+                }
+
+                .field-card-img {
+                    height: 220px;
+                    object-fit: cover;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                }
+
+                .field-card-body {
+                    padding: 1.5rem;
+                }
+
+                .field-type-badge {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    background: rgba(255,255,255,0.95);
+                    padding: 0.5rem 1rem;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                }
+
+                .price-tag {
+                    background: var(--success-color);
+                    color: white;
+                    padding: 0.5rem 1rem;
+                    border-radius: 10px;
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    display: inline-block;
+                }
+
+                /* Status Badges */
+                .status-badge {
+                    padding: 0.5rem 1.2rem;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    display: inline-block;
+                }
+
+                .status-borrador { background: #e5e7eb; color: #374151; }
+                .status-confirmada { background: #d1fae5; color: #065f46; }
+                .status-en_curso { background: #dbeafe; color: #1e40af; }
+                .status-completada { background: #e0e7ff; color: #4338ca; }
+                .status-cancelada { background: #fee2e2; color: #991b1b; }
+
+                /* Buttons */
+                .btn-modern {
+                    border-radius: 10px;
+                    padding: 0.75rem 2rem;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                    border: none;
+                }
+
+                .btn-modern:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                }
+
+                .btn-primary-modern {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+
+                .btn-success-modern {
+                    background: var(--success-color);
+                    color: white;
+                }
+
+                /* Stats Cards */
+                .stat-card {
+                    background: white;
+                    border-radius: 15px;
+                    padding: 1.5rem;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    text-align: center;
+                }
+
+                .stat-number {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    color: var(--primary-color);
+                }
+
+                .stat-label {
+                    color: #6b7280;
+                    font-size: 0.875rem;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+
+                /* Form Styling */
+                .modern-form {
+                    background: white;
+                    border-radius: 15px;
+                    padding: 2rem;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                }
+
+                .modern-form .form-label {
+                    font-weight: 600;
+                    color: var(--dark-color);
+                    margin-bottom: 0.5rem;
+                }
+
+                .modern-form .form-control {
+                    border-radius: 10px;
+                    border: 2px solid #e5e7eb;
+                    padding: 0.75rem 1rem;
+                }
+
+                .modern-form .form-control:focus {
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+                }
+
+                /* Empty State */
+                .empty-state {
+                    text-align: center;
+                    padding: 4rem 2rem;
+                }
+
+                .empty-state-icon {
+                    font-size: 4rem;
+                    color: #d1d5db;
+                    margin-bottom: 1rem;
+                }
+
+                /* Responsive */
+                @media (max-width: 768px) {
+                    .reserva-hero h1 {
+                        font-size: 1.75rem;
+                    }
+                    .field-card {
+                        margin-bottom: 1.5rem;
+                    }
+                }
+            </style>
+        </template>
+
+        <!-- Portal: Home Page with Featured Fields -->
+        <template id="portal_my_home_reservas" name="Portal My Home: Reservas" 
+                  inherit_id="portal.portal_my_home" priority="10">
+            <xpath expr="//div[@id='o_portal_my_home_content']" position="before">
+                <t t-call="reserva_canchas.portal_reserva_styles"/>
+                
+                <div class="reserva-hero">
+                    <div class="container">
+                        <h1><i class="fa fa-futbol-o"/> Reserva tu Cancha Deportiva</h1>
+                        <p>Encuentra y reserva la cancha perfecta para tu deporte favorito</p>
+                        <a href="/my/reservas/nueva" class="btn btn-light btn-lg btn-modern mt-3">
+                            <i class="fa fa-calendar-plus-o"/> Nueva Reserva
+                        </a>
+                    </div>
+                </div>
+            </xpath>
+            
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-set="reservas_count" t-value="len(request.env['reserva.reserva'].search([('usuario_id', '=', request.env.user.id)]))"/>
+                <t t-if="reservas_count">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <a href="/my/reservas" class="text-decoration-none">
+                            <div class="stat-card">
+                                <div class="stat-number"><t t-esc="reservas_count"/></div>
+                                <div class="stat-label">Mis Reservas</div>
+                                <i class="fa fa-calendar-check-o mt-2" style="font-size: 2rem; color: #667eea;"/>
+                            </div>
+                        </a>
+                    </div>
+                </t>
+            </xpath>
+        </template>
+
+        <!-- Portal: My Reservations List -->
+        <template id="portal_my_reservas" name="Mis Reservas">
+            <t t-call="portal.portal_layout">
+                <t t-call="reserva_canchas.portal_reserva_styles"/>
+                
+                <div class="container my-4">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h2><i class="fa fa-list"/> Mis Reservas</h2>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="/my/reservas/nueva" class="btn btn-primary-modern btn-modern">
+                                <i class="fa fa-plus"/> Nueva Reserva
+                            </a>
+                        </div>
+                    </div>
+
+                    <t t-if="not reservas">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fa fa-calendar-o"/>
+                            </div>
+                            <h3>No tienes reservas aún</h3>
+                            <p class="text-muted">Crea tu primera reserva para comenzar</p>
+                            <a href="/my/reservas/nueva" class="btn btn-primary-modern btn-modern mt-3">
+                                <i class="fa fa-plus"/> Crear Primera Reserva
+                            </a>
+                        </div>
+                    </t>
+
+                    <t t-if="reservas">
+                        <div class="row">
+                            <t t-foreach="reservas" t-as="reserva">
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card field-card">
+                                        <div class="card-body field-card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <h5 class="mb-0"><t t-esc="reserva.name"/></h5>
+                                                <span t-att-class="'status-badge status-' + reserva.estado">
+                                                    <t t-esc="dict(reserva._fields['estado'].selection).get(reserva.estado)"/>
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <h6 class="text-primary">
+                                                    <i class="fa fa-futbol-o"/> <t t-esc="reserva.cancha_id.nombre"/>
+                                                </h6>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-calendar"/> <t t-esc="reserva.fecha_inicio.strftime('%d/%m/%Y')"/>
+                                                </small>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-clock-o"/> 
+                                                    <t t-esc="reserva.fecha_inicio.strftime('%H:%M')"/> - 
+                                                    <t t-esc="reserva.fecha_fin.strftime('%H:%M')"/>
+                                                    (<t t-esc="'%.1f' % reserva.duracion"/> hrs)
+                                                </small>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="price-tag">
+                                                    S/. <t t-esc="'%.2f' % reserva.precio_total"/>
+                                                </div>
+                                                <a t-att-href="'/my/reservas/%s' % reserva.id" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fa fa-eye"/> Ver
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+        <!-- Portal: Reservation Detail -->
+        <template id="portal_reserva_page" name="Detalle de Reserva">
+            <t t-call="portal.portal_layout">
+                <t t-call="reserva_canchas.portal_reserva_styles"/>
+
+                <div class="container my-4">
+                    <t t-if="request.params.get('message') == 'created'">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fa fa-check-circle"/> <strong>¡Éxito!</strong> Tu reserva ha sido creada y confirmada.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                        </div>
+                    </t>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="modern-form">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3><i class="fa fa-file-text-o"/> <t t-esc="reserva.name"/></h3>
+                                    <span t-att-class="'status-badge status-' + reserva.estado">
+                                        <t t-esc="dict(reserva._fields['estado'].selection).get(reserva.estado)"/>
+                                    </span>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted">Cancha</label>
+                                            <div class="h5">
+                                                <i class="fa fa-futbol-o text-primary"/> <t t-esc="reserva.cancha_id.nombre"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted">Cliente</label>
+                                            <div class="h5">
+                                                <i class="fa fa-user text-primary"/> <t t-esc="reserva.usuario_id.name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted">Fecha y Hora de Inicio</label>
+                                            <div class="h5">
+                                                <i class="fa fa-calendar"/> <t t-esc="reserva.fecha_inicio.strftime('%d/%m/%Y %H:%M')"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted">Fecha y Hora de Fin</label>
+                                            <div class="h5">
+                                                <i class="fa fa-calendar"/> <t t-esc="reserva.fecha_fin.strftime('%d/%m/%Y %H:%M')"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted">Duración</label>
+                                            <div class="h5">
+                                                <i class="fa fa-clock-o"/> <t t-esc="'%.1f' % reserva.duracion"/> horas
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-muted">Precio Total</label>
+                                            <div class="price-tag">
+                                                S/. <t t-esc="'%.2f' % reserva.precio_total"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <t t-if="reserva.notas">
+                                    <div class="mb-4">
+                                        <label class="form-label text-muted">Notas</label>
+                                        <div class="p-3 bg-light rounded">
+                                            <t t-esc="reserva.notas"/>
+                                        </div>
+                                    </div>
+                                </t>
+
+                                <div class="mt-4">
+                                    <t t-if="reserva.estado in ['borrador', 'confirmada']">
+                                        <button class="btn btn-danger btn-modern" onclick="confirmCancel(this)" t-att-data-id="reserva.id">
+                                            <i class="fa fa-times"/> Cancelar Reserva
+                                        </button>
+                                    </t>
+                                    <a href="/my/reservas" class="btn btn-outline-secondary btn-modern">
+                                        <i class="fa fa-arrow-left"/> Volver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="modern-form">
+                                <h5 class="mb-3">Información de la Cancha</h5>
+                                <t t-if="reserva.cancha_id.imagen">
+                                    <img class="img-fluid rounded mb-3" t-att-src="'/web/image/reserva.cancha/%s/imagen' % reserva.cancha_id.id" t-att-alt="reserva.cancha_id.nombre"/>
+                                </t>
+                                <div class="mb-2">
+                                    <strong>Tipo:</strong> <t t-esc="dict(reserva.cancha_id._fields['tipo'].selection).get(reserva.cancha_id.tipo)"/>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Capacidad:</strong> <t t-esc="reserva.cancha_id.capacidad"/> personas
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Precio/hora:</strong> S/. <t t-esc="'%.2f' % reserva.cancha_id.precio_hora"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function confirmCancel(element) {
+                        if (confirm('¿Está seguro de que desea cancelar esta reserva?')) {
+                            var reservaId = element.getAttribute('data-id');
+                            window.location.href = '/my/reservas/' + reservaId + '/cancel';
+                        }
+                        return false;
+                    }
+                </script>
+            </t>
+        </template>
+
+        <!-- Portal: New Reservation - Field Selection -->
+        <template id="portal_nueva_reserva_canchas" name="Nueva Reserva - Seleccionar Cancha">
+            <t t-call="portal.portal_layout">
+                <t t-call="reserva_canchas.portal_reserva_styles"/>
+                
+                <div class="reserva-hero">
+                    <div class="container text-center">
+                        <h1><i class="fa fa-calendar-plus-o"/> Selecciona una Cancha</h1>
+                        <p>Elige la cancha perfecta para tu actividad deportiva</p>
+                    </div>
+                </div>
+
+                <div class="container my-4">
+                    <t t-if="request.params.get('error')">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fa fa-exclamation-circle"/> <t t-esc="request.params.get('error')"/>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                        </div>
+                    </t>
+
+                    <t t-if="not canchas">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fa fa-exclamation-triangle"/>
+                            </div>
+                            <h3>No hay canchas disponibles</h3>
+                            <p class="text-muted">Por favor, intenta más tarde</p>
+                        </div>
+                    </t>
+
+                    <t t-if="canchas">
+                        <div class="row">
+                            <t t-foreach="canchas" t-as="cancha">
+                                <div class="col-md-4 mb-4">
+                                    <div class="card field-card">
+                                        <div class="position-relative">
+                                            <t t-if="cancha.imagen">
+                                                <img class="field-card-img w-100" t-att-src="'/web/image/reserva.cancha/%s/imagen' % cancha.id" t-att-alt="cancha.nombre"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="field-card-img d-flex align-items-center justify-content-center">
+                                                    <i class="fa fa-futbol-o" style="font-size: 4rem; color: white; opacity: 0.8;"/>
+                                                </div>
+                                            </t>
+                                            <span class="field-type-badge">
+                                                <t t-esc="dict(cancha._fields['tipo'].selection).get(cancha.tipo)"/>
+                                            </span>
+                                        </div>
+                                        <div class="card-body field-card-body">
+                                            <h5 class="mb-3"><t t-esc="cancha.nombre"/></h5>
+                                            <div class="mb-2">
+                                                <i class="fa fa-users text-muted"/> 
+                                                <small>Capacidad: <strong><t t-esc="cancha.capacidad"/> personas</strong></small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <i class="fa fa-tag text-muted"/> 
+                                                <small>Precio/hora: <strong class="text-success">S/. <t t-esc="'%.2f' % cancha.precio_hora"/></strong></small>
+                                            </div>
+                                            <t t-if="cancha.descripcion">
+                                                <p class="text-muted small mb-3">
+                                                    <t t-esc="cancha.descripcion[:100]"/>...
+                                                </p>
+                                            </t>
+                                            <a t-att-href="'/my/reservas/nueva/%s' % cancha.id" class="btn btn-primary-modern btn-modern w-100">
+                                                <i class="fa fa-calendar-check-o"/> Reservar Ahora
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+        <!-- Portal: New Reservation - Form -->
+        <template id="portal_nueva_reserva_form" name="Nueva Reserva - Formulario">
+            <t t-call="portal.portal_layout">
+                <t t-call="reserva_canchas.portal_reserva_styles"/>
+
+                <div class="reserva-hero">
+                    <div class="container text-center">
+                        <h1><i class="fa fa-calendar-plus-o"/> Completa tu Reserva</h1>
+                        <p>Estás a un paso de reservar <strong><t t-esc="cancha.nombre"/></strong></p>
+                    </div>
+                </div>
+
+                <div class="container my-4">
+                    <t t-if="request.params.get('error')">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fa fa-exclamation-circle"/> <t t-esc="request.params.get('error')"/>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                        </div>
+                    </t>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="modern-form">
+                                <h4 class="mb-4"><i class="fa fa-edit"/> Datos de la Reserva</h4>
+
+                                <form action="/my/reservas/crear" method="POST">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="cancha_id" t-att-value="cancha.id"/>
+
+                                    <div class="mb-4">
+                                        <label for="fecha_inicio" class="form-label">
+                                            <i class="fa fa-calendar"/> Fecha y Hora de Inicio *
+                                        </label>
+                                        <input type="datetime-local" class="form-control" id="fecha_inicio" 
+                                               name="fecha_inicio" required="required"/>
+                                        <small class="text-muted">Selecciona cuándo quieres comenzar</small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="fecha_fin" class="form-label">
+                                            <i class="fa fa-calendar"/> Fecha y Hora de Fin *
+                                        </label>
+                                        <input type="datetime-local" class="form-control" id="fecha_fin" 
+                                               name="fecha_fin" required="required"/>
+                                        <small class="text-muted">Selecciona cuándo terminarás</small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="notas" class="form-label">
+                                            <i class="fa fa-sticky-note-o"/> Notas (opcional)
+                                        </label>
+                                        <textarea class="form-control" id="notas" name="notas" rows="4" 
+                                                  placeholder="Agrega cualquier información adicional sobre tu reserva..."></textarea>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="fa fa-info-circle"/> 
+                                        <strong>Información importante:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>Duración mínima: 30 minutos</li>
+                                            <li>Duración máxima: 8 horas</li>
+                                            <li>Tu reserva será confirmada automáticamente</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-success-modern btn-modern">
+                                            <i class="fa fa-check"/> Confirmar Reserva
+                                        </button>
+                                        <a href="/my/reservas/nueva" class="btn btn-outline-secondary btn-modern">
+                                            <i class="fa fa-arrow-left"/> Cambiar Cancha
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="modern-form sticky-top" style="top: 20px;">
+                                <h5 class="mb-3"><i class="fa fa-info-circle"/> Resumen</h5>
+                                
+                                <t t-if="cancha.imagen">
+                                    <img class="img-fluid rounded mb-3" t-att-src="'/web/image/reserva.cancha/%s/imagen' % cancha.id" t-att-alt="cancha.nombre"/>
+                                </t>
+
+                                <h6 class="text-primary"><t t-esc="cancha.nombre"/></h6>
+                                
+                                <hr/>
+                                
+                                <div class="mb-2">
+                                    <strong><i class="fa fa-tag"/> Tipo:</strong> 
+                                    <t t-esc="dict(cancha._fields['tipo'].selection).get(cancha.tipo)"/>
+                                </div>
+                                <div class="mb-2">
+                                    <strong><i class="fa fa-users"/> Capacidad:</strong> 
+                                    <t t-esc="cancha.capacidad"/> personas
+                                </div>
+                                <div class="mb-3">
+                                    <strong><i class="fa fa-money"/> Precio/hora:</strong> 
+                                    <span class="text-success">S/. <t t-esc="'%.2f' % cancha.precio_hora"/></span>
+                                </div>
+
+                                <t t-if="cancha.descripcion">
+                                    <hr/>
+                                    <p class="small text-muted mb-0">
+                                        <t t-esc="cancha.descripcion"/>
+                                    </p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>
+
         <template id="portal_my_home_menu_reservas" name="Portal My Home: Reservas" 
                   inherit_id="portal.portal_my_home" priority="40">
             <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
