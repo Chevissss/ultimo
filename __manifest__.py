@@ -22,7 +22,6 @@
         'views/cancha_views.xml',
         'views/reserva_views.xml',
         'views/portal_templates.xml',
-        'views/assets_templates.xml',
         # 3. Menús (DESPUÉS de las vistas porque referencian las acciones)
         'views/menu_views.xml',
         # 4. Permisos de acceso (ahora los modelos ya existen)
