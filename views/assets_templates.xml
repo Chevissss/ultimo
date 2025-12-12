@@ -3,7 +3,7 @@
     <data>
         
         <!-- Assets Frontend: Estilos para el portal de reservas -->
-        <template id="assets_frontend" inherit_id="web.assets_frontend" name="Reserva Canchas Portal Assets">
+        <template id="assets_frontend" inherit_id="website.assets_frontend" name="Reserva Canchas Portal Assets">
             <xpath expr="." position="inside">
                 <style type="text/css">
                     /* Estilos para el portal de reservas de canchas */
