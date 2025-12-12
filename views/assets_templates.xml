@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Assets Frontend: Estilos para el portal de reservas -->
+        <template id="assets_frontend" inherit_id="web.assets_frontend" name="Reserva Canchas Portal Assets">
+            <xpath expr="." position="inside">
+                <style type="text/css">
+                    /* Estilos para el portal de reservas de canchas */
+                    
+                    /* Cards de canchas */
+                    .reserva-cancha-card {
+                        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                        border-radius: 8px;
+                        overflow: hidden;
+                    }
+                    
+                    .reserva-cancha-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                    }
+                    
+                    .reserva-cancha-card .card-img-top {
+                        height: 200px;
+                        object-fit: cover;
+                    }
+                    
+                    /* Badges de estado */
+                    .badge-reserva {
+                        padding: 0.5em 1em;
+                        font-size: 0.875rem;
+                        border-radius: 20px;
+                    }
+                    
+                    /* Formularios */
+                    .reserva-form-container {
+                        background: #f8f9fa;
+                        padding: 2rem;
+                        border-radius: 8px;
+                    }
+                    
+                    /* Tabla de reservas */
+                    .reservas-table {
+                        background: white;
+                        border-radius: 8px;
+                        overflow: hidden;
+                    }
+                    
+                    .reservas-table thead {
+                        background: #007bff;
+                        color: white;
+                    }
+                    
+                    .reservas-table tbody tr:hover {
+                        background-color: #f1f3f5;
+                    }
+                    
+                    /* Botones */
+                    .btn-reserva {
+                        border-radius: 25px;
+                        padding: 0.5rem 1.5rem;
+                        font-weight: 500;
+                    }
+                    
+                    /* Alertas y mensajes */
+                    .alert-reserva {
+                        border-radius: 8px;
+                        border-left: 4px solid;
+                    }
+                    
+                    .alert-reserva.alert-success {
+                        border-left-color: #28a745;
+                    }
+                    
+                    .alert-reserva.alert-danger {
+                        border-left-color: #dc3545;
+                    }
+                    
+                    /* Responsive adjustments */
+                    @media (max-width: 768px) {
+                        .reserva-cancha-card {
+                            margin-bottom: 1rem;
+                        }
+                    }
+                </style>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

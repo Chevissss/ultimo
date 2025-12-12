@@ -70,5 +70,28 @@
             <field name="perm_unlink" eval="True"/>
         </record>
 
+        <!-- Reglas de registro: Portal Users -->
+        <record id="reserva_cancha_rule_portal" model="ir.rule">
+            <field name="name">Cancha: Portal - Solo Activas y Disponibles</field>
+            <field name="model_id" ref="reserva_canchas.model_reserva_cancha"/>
+            <field name="domain_force">[('activa', '=', True), ('estado', '=', 'disponible')]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="reserva_reserva_rule_portal" model="ir.rule">
+            <field name="name">Reserva: Portal - Solo sus reservas</field>
+            <field name="model_id" ref="reserva_canchas.model_reserva_reserva"/>
+            <field name="domain_force">[('usuario_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
     </data>
 </odoo>

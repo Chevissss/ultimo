@@ -16,18 +16,19 @@
     'website': 'https://www.tuempresa.com',
     'depends': ['base', 'web', 'portal', 'mail'],
     'data': [
-        # 1. Primero la seguridad básica (grupos)
+        # 1. Primero la seguridad básica (grupos y secuencia)
         'security/security.xml',
-        # 2. Luego los permisos de acceso
-        'security/ir.model.access.csv',
-        # 3. Después las reglas de registro (requieren que existan los modelos)
-        'security/ir_rule.xml',
-        # 4. Vistas y menús
-        'views/menu_views.xml',
+        # 2. Vistas (esto crea los modelos y las acciones)
         'views/cancha_views.xml',
         'views/reserva_views.xml',
         'views/portal_templates.xml',
-        # 5. Datos de demostración
+        'views/assets_templates.xml',
+        # 3. Menús (DESPUÉS de las vistas porque referencian las acciones)
+        'views/menu_views.xml',
+        # 4. Permisos de acceso (ahora los modelos ya existen)
+        'security/ir.model.access.csv',
+        'security/ir_rule.xml',
+        # 5. Finalmente datos de demostración
         'data/cancha_data.xml',
     ],
     'demo': [],

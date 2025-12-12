@@ -53,7 +53,7 @@
                                 <td><t t-esc="'%.1f' % reserva.duracion"/> hrs</td>
                                 <td><t t-esc="reserva.precio_total" t-options="{'widget': 'monetary', 'display_currency': reserva.company_id.currency_id}"/></td>
                                 <td>
-                                    <span t-att-class="'badge badge-pill badge-%s' % ('success' if reserva.estado == 'confirmada' else 'info' if reserva.estado == 'en_curso' else 'primary' if reserva.estado == 'completada' else 'danger' if reserva.estado == 'cancelada' else 'secondary')">
+                                    <span t-att-class="'badge rounded-pill badge-reserva bg-%s' % ('success' if reserva.estado == 'confirmada' else 'info' if reserva.estado == 'en_curso' else 'primary' if reserva.estado == 'completada' else 'danger' if reserva.estado == 'cancelada' else 'secondary')">
                                         <t t-esc="dict(reserva._fields['estado'].selection).get(reserva.estado)"/>
                                     </span>
                                 </td>
@@ -78,13 +78,20 @@
                     </t>
                 </t>
 
+                <t t-if="request.params.get('message') == 'created'">
+                    <div class="alert alert-success alert-reserva alert-dismissible fade show" role="alert">
+                        <i class="fa fa-check-circle"/> ¡Reserva creada exitosamente!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
                             <div class="col-12">
                                 <h4>
                                     <t t-esc="reserva.name"/>
-                                    <span t-att-class="'badge badge-%s float-right' % ('success' if reserva.estado == 'confirmada' else 'info' if reserva.estado == 'en_curso' else 'primary' if reserva.estado == 'completada' else 'danger' if reserva.estado == 'cancelada' else 'secondary')">
+                                    <span t-att-class="'badge rounded-pill badge-reserva bg-%s float-end' % ('success' if reserva.estado == 'confirmada' else 'info' if reserva.estado == 'en_curso' else 'primary' if reserva.estado == 'completada' else 'danger' if reserva.estado == 'cancelada' else 'secondary')">
                                         <t t-esc="dict(reserva._fields['estado'].selection).get(reserva.estado)"/>
                                     </span>
                                 </h4>
@@ -183,8 +190,14 @@
                 <div class="container mt-4">
                     <h2>Nueva Reserva - Seleccione una Cancha</h2>
 
+                    <t t-if="request.params.get('error')">
+                        <div class="alert alert-danger alert-reserva" role="alert">
+                            <i class="fa fa-exclamation-circle"/> <t t-esc="request.params.get('error')"/>
+                        </div>
+                    </t>
+
                     <t t-if="not canchas">
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning alert-reserva" role="alert">
                             No hay canchas disponibles en este momento.
                         </div>
                     </t>
@@ -192,9 +205,9 @@
                     <div class="row mt-4">
                         <t t-foreach="canchas" t-as="cancha">
                             <div class="col-md-4 mb-4">
-                                <div class="card h-100">
+                                <div class="card h-100 reserva-cancha-card">
                                     <t t-if="cancha.imagen">
-                                        <img class="card-img-top" t-att-src="'data:image/png;base64,%s' % cancha.imagen.decode('utf-8')" alt="Cancha"/>
+                                        <img class="card-img-top" t-att-src="'/web/image/reserva.cancha/%s/imagen' % cancha.id" t-att-alt="cancha.nombre"/>
                                     </t>
                                     <t t-else="">
                                         <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
@@ -211,7 +224,7 @@
                                         <t t-if="cancha.descripcion">
                                             <p class="card-text"><small><t t-esc="cancha.descripcion[:100]"/>...</small></p>
                                         </t>
-                                        <a t-att-href="'/my/reservas/nueva/%s' % cancha.id" class="btn btn-primary btn-block">
+                                        <a t-att-href="'/my/reservas/nueva/%s' % cancha.id" class="btn btn-primary w-100 btn-reserva">
                                             <i class="fa fa-calendar"/> Reservar
                                         </a>
                                     </div>
@@ -228,6 +241,12 @@
             <t t-call="portal.portal_layout">
                 <div class="container mt-4">
                     <h2>Nueva Reserva</h2>
+
+                    <t t-if="request.params.get('error')">
+                        <div class="alert alert-danger alert-reserva" role="alert">
+                            <i class="fa fa-exclamation-circle"/> <t t-esc="request.params.get('error')"/>
+                        </div>
+                    </t>
 
                     <div class="row mt-4">
                         <div class="col-md-8">
@@ -278,7 +297,7 @@
 
                         <div class="col-md-4">
                             <t t-if="cancha.imagen">
-                                <img class="img-fluid rounded" t-att-src="'data:image/png;base64,%s' % cancha.imagen.decode('utf-8')" alt="Cancha"/>
+                                <img class="img-fluid rounded" t-att-src="'/web/image/reserva.cancha/%s/imagen' % cancha.id" t-att-alt="cancha.nombre"/>
                             </t>
                         </div>
                     </div>

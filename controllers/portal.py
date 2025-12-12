@@ -12,9 +12,14 @@ class ReservaPortal(CustomerPortal):
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
         if 'reservas_count' in counters:
-            values['reservas_count'] = request.env['reserva.reserva'].search_count([
-                ('usuario_id', '=', request.env.user.id)
-            ]) if request.env['reserva.reserva'].check_access_rights('read', raise_exception=False) else 0
+            # Verificar acceso antes de contar
+            ReservaReserva = request.env['reserva.reserva']
+            if ReservaReserva.check_access_rights('read', raise_exception=False):
+                values['reservas_count'] = ReservaReserva.search_count([
+                    ('usuario_id', '=', request.env.user.id)
+                ])
+            else:
+                values['reservas_count'] = 0
         return values
 
     @http.route(['/my/reservas', '/my/reservas/page/<int:page>'], type='http', auth="user", website=True)
@@ -121,9 +126,18 @@ class ReservaPortal(CustomerPortal):
             fecha_fin_str = post.get('fecha_fin')
             notas = post.get('notas', '')
 
+            # Validar que se recibieron los datos necesarios
+            if not cancha_id or not fecha_inicio_str or not fecha_fin_str:
+                return request.redirect('/my/reservas/nueva?error=Datos incompletos')
+
             # Convertir strings a datetime
             fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%dT%H:%M')
             fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%dT%H:%M')
+
+            # Verificar que la cancha existe y está disponible
+            cancha = request.env['reserva.cancha'].sudo().browse(cancha_id)
+            if not cancha.exists() or not cancha.activa or cancha.estado != 'disponible':
+                return request.redirect('/my/reservas/nueva?error=Cancha no disponible')
 
             # Crear la reserva
             reserva = request.env['reserva.reserva'].create({
@@ -141,10 +155,12 @@ class ReservaPortal(CustomerPortal):
             return request.redirect('/my/reservas/%s?message=created' % reserva.id)
 
         except ValidationError as e:
-            error_msg = str(e)
+            error_msg = str(e.name) if hasattr(e, 'name') else str(e)
             return request.redirect('/my/reservas/nueva?error=%s' % error_msg)
+        except ValueError as e:
+            return request.redirect('/my/reservas/nueva?error=Formato de fecha inválido')
         except Exception as e:
-            return request.redirect('/my/reservas/nueva?error=Error al crear la reserva')
+            return request.redirect('/my/reservas/nueva?error=Error al crear la reserva. Intente nuevamente')
 
     def _document_check_access(self, model_name, document_id, access_token=None):
         document = request.env[model_name].browse([document_id])
